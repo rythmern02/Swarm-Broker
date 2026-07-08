@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Swarm Broker — Global Styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #2A2A3A #0A0A0F;
+}
+
+*::-webkit-scrollbar {
+  width: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #0A0A0F;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #2A2A3A;
+  border-radius: 3px;
+}
+
+::selection {
+  background-color: rgba(171, 159, 242, 0.3);
+  color: #F4F4F5;
+}

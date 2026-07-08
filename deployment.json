@@ -1,0 +1,12 @@
+{
+  "network": "botchainTestnet",
+  "chainId": 968,
+  "deployer": "0x18AF72239dD6a52426e4dd9509C6515Df06477E4",
+  "contracts": {
+    "MockUSDC": {
+      "address": "0x0a787b1BDeD316ff833113be958Dcd1dF9654940",
+      "decimals": 6
+    }
+  },
+  "deployedAt": "2026-07-08T10:48:04.933Z"
+}

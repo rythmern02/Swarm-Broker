@@ -1,0 +1,19 @@
+{
+  "name": "swarm-broker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Swarm Broker — MCP-driven AI Financial Agent with x402 micropayments on BOT Chain",
+  "author": "Swarm Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "contracts:compile": "pnpm --filter @swarm/contracts compile",
+    "contracts:deploy": "pnpm --filter @swarm/contracts run deploy",
+    "provider:dev": "pnpm --filter @swarm/provider-node dev",
+    "agent:run": "pnpm --filter @swarm/agent-client start",
+    "frontend:dev": "pnpm --filter @swarm/frontend dev",
+    "install:all": "pnpm install"
+  }
+}
