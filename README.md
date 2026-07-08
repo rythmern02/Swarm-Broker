@@ -1,6 +1,5 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/rythmern02/Swarm-Broker/main/banner.png" alt="Swarm Broker Banner" width="100%" />
-  <h1>🐝 Swarm Broker</h1>
+  <h1>Swarm Broker</h1>
   <p><strong>The Machine-to-Machine (M2M) Economy for Autonomous AI Agents</strong></p>
   
   [![BOT Chain](https://img.shields.io/badge/BOT_Chain-Testnet_968-blueviolet?style=for-the-badge)](https://scan.bohr.life)
@@ -10,20 +9,20 @@
 
 <br/>
 
-## 🛑 The Problem: AI Agents Are Trapped
+## The Problem: AI Agents Are Trapped
 We are building highly advanced autonomous AI agents, but forcing them to use human payment rails. If an AI agent wants to fetch premium weather data, rent GPU compute, or hire another AI agent, it hits a paywall.
 * Stripe blocks automated bots.
 * API keys require human credit cards.
 * Standard crypto payments (Approve + Transfer) require two slow, expensive on-chain transactions.
 
-## 🚀 The Solution: Swarm Broker
+## The Solution: Swarm Broker
 **Swarm Broker** is a full-stack infrastructure that gives AI agents their own wallets and allows them to autonomously negotiate, sign, and pay for APIs using the **x402 (HTTP 402 Payment Required)** protocol. 
 
-By utilizing **BOT Chain's** lightning-fast EVM and **EIP-2612 (ERC20Permit)** gasless signatures, agents can negotiate micro-fees off-chain at 10,000+ TPS and settle instantly. Zero human interaction required.
+By utilizing **BOT Chain's** lightning-fast EVM and **EIP-2612 (ERC20Permit)** gasless signatures, agents can negotiate micro-fees off-chain at 10,000+ TPS and settle instantly. Zero human interaction required ;)
 
 ---
 
-## 🔗 Live On-Chain Deployment (BOT Chain Testnet)
+## Live On-Chain Deployment (BOT Chain Testnet)
 
 We deployed a custom `ERC20Permit` stablecoin to the BOT Chain Testnet to facilitate the gasless agent economy. 
 
@@ -37,13 +36,13 @@ We deployed a custom `ERC20Permit` stablecoin to the BOT Chain Testnet to facili
 
 ---
 
-## 🏗️ Architecture
+## Architecture
 
 The monorepo is split into three interconnected microservices that form a closed-loop economy:
 
 ```mermaid
 graph TD
-    A[🤖 Agent Client<br/>Autonomous AI] -->|1. HTTP GET /api/data| B(📡 Provider Node<br/>DePIN Sensor)
+    A[Agent Client<br/>Autonomous AI] -->|1. HTTP GET /api/data| B(Provider Node<br/>DePIN Sensor)
     B -->|2. 402 Payment Required| A
     A -->|3. EIP-712 Signature Header| B
     B -->|4. Serves Data Payload| A
@@ -57,7 +56,7 @@ graph TD
 
 ---
 
-## ⚡ Quick Start & Testing Guide
+## Quick Start & Testing Guide
 
 Want to watch an AI agent autonomously negotiate and pay for data in real-time? Follow these steps:
 
@@ -93,12 +92,12 @@ pnpm agent:run
 **Terminal 3: Start the Visualizer Dashboard**
 ```bash
 pnpm frontend:dev
-# Open localhost:5173 to watch the real-time cryptographic negotiation!
+# Open localhost:5173 to watch the real-time cryptographic negotiation :)
 ```
 
 ---
 
-## 🏆 Hackathon Notes (BOT Chain Builder Challenge #1)
+## Hackathon Notes (BOT Chain Builder Challenge #1)
 This project was built for the **BOT Chain Builder Challenge #1**. 
 * **Track:** AI Agent
 * **Core Tech:** BOT Chain EVM, x402 Protocol, EIP-712, ERC20Permit.
