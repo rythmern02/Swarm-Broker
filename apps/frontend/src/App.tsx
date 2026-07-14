@@ -119,7 +119,9 @@ function App() {
   }, [providerLogs]);
 
   useEffect(() => {
-    const ws = new WebSocket(`ws://${window.location.hostname}:4402/ws`);
+    const providerUrl = import.meta.env.VITE_PROVIDER_URL || "https://swarm-broker.onrender.com";
+    const wsUrl = providerUrl.replace(/^http/, "ws") + "/ws";
+    const ws = new WebSocket(wsUrl);
     
     ws.onmessage = (event) => {
       try {
