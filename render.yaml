@@ -1,0 +1,41 @@
+services:
+  # 1. The Provider Node (Web Service)
+  - type: web
+    name: provider-node
+    env: node
+    buildCommand: pnpm install && pnpm --filter @swarm/provider-node build
+    startCommand: pnpm --filter @swarm/provider-node start
+    envVars:
+      - key: PNPM_VERSION
+        value: 11.10.0
+      - key: BOT_CHAIN_RPC_URL
+        sync: false
+      - key: PRIVATE_KEY
+        sync: false
+
+  # 2. The Agent Client (Background Worker)
+  - type: worker
+    name: agent-client
+    env: node
+    buildCommand: pnpm install && pnpm --filter @swarm/agent-client build
+    startCommand: pnpm --filter @swarm/agent-client start
+    envVars:
+      - key: PNPM_VERSION
+        value: 11.10.0
+      - key: PROVIDER_URL
+        fromService:
+          type: web
+          name: provider-node
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: PRIVATE_KEY
+        sync: false
+        
+  # 3. The Frontend (Static Site)
+  - type: web
+    name: frontend-site
+    env: static
+    buildCommand: pnpm install && pnpm --filter @swarm/frontend build
+    staticPublishPath: apps/frontend/dist
+    envVars:
+      - key: PNPM_VERSION
+        value: 11.10.0
