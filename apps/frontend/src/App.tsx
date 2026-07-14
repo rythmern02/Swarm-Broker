@@ -9,7 +9,9 @@ import {
   Zap,
   CheckCircle2,
   Lock,
-  Coins
+  Coins,
+  Play,
+  Square
 } from "lucide-react";
 
 // ── Types ──────────────────────────────────────────────────────────
@@ -36,7 +38,7 @@ const generateId = () => Math.random().toString(36).substring(2, 9);
 
 // ── Components ─────────────────────────────────────────────────────
 
-const PanelHeader = ({ icon: Icon, title, status }: { icon: any, title: string, status: "online" | "waiting" }) => (
+const PanelHeader = ({ icon: Icon, title, status, children }: { icon: any, title: string, status: "online" | "waiting", children?: React.ReactNode }) => (
   <div className="flex items-center justify-between p-4 border-b border-phantom-border bg-phantom-surface sticky top-0 z-10 backdrop-blur-md bg-opacity-90">
     <div className="flex items-center gap-3">
       <div className="p-2 rounded-lg bg-phantom-card border border-phantom-border">
@@ -44,11 +46,14 @@ const PanelHeader = ({ icon: Icon, title, status }: { icon: any, title: string, 
       </div>
       <h2 className="font-semibold text-phantom-text tracking-wide text-sm">{title}</h2>
     </div>
-    <div className="flex items-center gap-2">
-      <div className={`w-2 h-2 rounded-full ${status === "online" ? "bg-phantom-success animate-pulse-slow" : "bg-phantom-warning"}`} />
-      <span className="text-xs text-phantom-muted uppercase tracking-wider font-mono">
-        {status}
-      </span>
+    <div className="flex items-center gap-4">
+      {children}
+      <div className="flex items-center gap-2">
+        <div className={`w-2 h-2 rounded-full ${status === "online" ? "bg-phantom-success animate-pulse-slow" : "bg-phantom-warning"}`} />
+        <span className="text-xs text-phantom-muted uppercase tracking-wider font-mono">
+          {status}
+        </span>
+      </div>
     </div>
   </div>
 );
@@ -103,12 +108,32 @@ const LogEntry = ({ log }: { log: LogEvent }) => {
 
 function App() {
   const [logs, setLogs] = useState<LogEvent[]>([]);
-  const agentLogs = logs.filter(l => l.source === "agent");
+  const [agentRunning, setAgentRunning] = useState(false);
+  const agentLogs = logs.filter(l => l.source === "agent" || l.type === "AGENT_OFFLINE");
   const providerLogs = logs.filter(l => l.source === "provider");
   const settlementLogs = logs.filter(l => l.type === "PAYMENT_SIGNED" || l.type === "DATA_SERVED");
 
   const agentEndRef = useRef<HTMLDivElement>(null);
   const providerEndRef = useRef<HTMLDivElement>(null);
+
+  const providerUrl = import.meta.env.VITE_PROVIDER_URL || "https://swarm-broker.onrender.com";
+
+  useEffect(() => {
+    fetch(`${providerUrl}/api/agent/status`)
+      .then(r => r.json())
+      .then(d => setAgentRunning(d.running))
+      .catch(console.error);
+  }, [providerUrl]);
+
+  const toggleAgent = async () => {
+    try {
+      const endpoint = agentRunning ? "/api/agent/stop" : "/api/agent/start";
+      const res = await fetch(`${providerUrl}${endpoint}`, { method: "POST" });
+      if (res.ok) setAgentRunning(!agentRunning);
+    } catch (e) {
+      console.error("Failed to toggle agent", e);
+    }
+  };
 
   useEffect(() => {
     agentEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -119,7 +144,6 @@ function App() {
   }, [providerLogs]);
 
   useEffect(() => {
-    const providerUrl = import.meta.env.VITE_PROVIDER_URL || "https://swarm-broker.onrender.com";
     const wsUrl = providerUrl.replace(/^http/, "ws") + "/ws";
     const ws = new WebSocket(wsUrl);
     
@@ -165,8 +189,20 @@ function App() {
           <PanelHeader 
             icon={Terminal} 
             title="Master Agent" 
-            status={agentLogs.length > 0 ? "online" : "waiting"} 
-          />
+            status={agentRunning || agentLogs.length > 0 ? "online" : "waiting"} 
+          >
+            <button 
+              onClick={toggleAgent}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[10px] font-bold tracking-widest uppercase transition-colors ${
+                agentRunning 
+                  ? "bg-red-500/10 text-red-500 border border-red-500/20 hover:bg-red-500/20" 
+                  : "bg-phantom-success/10 text-phantom-success border border-phantom-success/20 hover:bg-phantom-success/20"
+              }`}
+            >
+              {agentRunning ? <Square size={12} className="fill-current" /> : <Play size={12} className="fill-current" />}
+              {agentRunning ? "Stop Agent" : "Start Agent"}
+            </button>
+          </PanelHeader>
           <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar relative">
             {agentLogs.length === 0 && (
               <div className="absolute inset-0 flex items-center justify-center text-phantom-muted font-mono text-sm">

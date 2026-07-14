@@ -4,6 +4,7 @@ import http from "http";
 import { WebSocketServer, WebSocket } from "ws";
 import dotenv from "dotenv";
 import path from "path";
+import { spawn, ChildProcess } from "child_process";
 import { paymentMiddleware, x402ResourceServer } from "@x402/express";
 import { ExactEvmScheme } from "@x402/evm/exact/server";
 import { HTTPFacilitatorClient } from "@x402/core/server";
@@ -216,6 +217,52 @@ app.get("/api/config", (_req, res) => {
       "/api/market-data": { price: PRICE, currency: "USDC", scheme: "exact" },
     },
   });
+});
+
+// ── Agent Control Endpoints ─────────────────────────────────────────
+let agentProcess: ChildProcess | null = null;
+
+app.get("/api/agent/status", (_req, res) => {
+  res.json({ running: agentProcess !== null });
+});
+
+app.post("/api/agent/start", (req, res) => {
+  if (agentProcess) {
+    return res.status(400).json({ error: "Agent is already running" });
+  }
+
+  const agentPath = path.resolve(__dirname, "../../agent-client/src/agent.ts");
+  const agentCwd = path.resolve(__dirname, "../../agent-client");
+
+  agentProcess = spawn("npx", ["ts-node", agentPath], {
+    cwd: agentCwd,
+    env: { ...process.env, FORCE_COLOR: "1" },
+  });
+
+  agentProcess.stdout?.on("data", (data) => console.log(`[Agent] ${data}`));
+  agentProcess.stderr?.on("data", (data) => console.error(`[Agent] ${data}`));
+
+  agentProcess.on("close", () => {
+    agentProcess = null;
+    broadcast({
+      type: "AGENT_OFFLINE",
+      source: "system",
+      timestamp: new Date().toISOString(),
+      data: { message: "Agent process stopped" },
+    });
+  });
+
+  res.json({ success: true, status: "started" });
+});
+
+app.post("/api/agent/stop", (req, res) => {
+  if (!agentProcess) {
+    return res.status(400).json({ error: "Agent is not running" });
+  }
+  
+  agentProcess.kill("SIGKILL");
+  agentProcess = null;
+  res.json({ success: true, status: "stopped" });
 });
 
 // ── Start Server ───────────────────────────────────────────────────
